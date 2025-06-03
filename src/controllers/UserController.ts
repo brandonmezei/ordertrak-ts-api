@@ -5,7 +5,10 @@ import bcrypt from "bcrypt";
 import { isValidPassword } from "../utils/validators";
 import jwt from "jsonwebtoken";
 
-export const registerUser = async (req: Request, res: Response) : Promise<void> => {
+export const registerUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { FirstName, LastName, Email, Password } = req.body;
 
@@ -15,18 +18,19 @@ export const registerUser = async (req: Request, res: Response) : Promise<void> 
       return;
     }
 
-    const normalizedEmail = Email.toLowerCase();
-
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(normalizedEmail)) {
+    if (!emailRegex.test(Email)) {
       res.status(400).json({ error: "Invalid email format." });
       return;
     }
 
     // Check if Already in Use
-    const existingUser = await User.findOne({ Email: normalizedEmail, IsDelete : false });
+    const existingUser = await User.findOne({
+      EmailNormalized: Email.toLowerCase(),
+      IsDelete: false,
+    });
 
     if (existingUser) {
       res.status(400).json({ error: "Email already in use." });
@@ -48,8 +52,11 @@ export const registerUser = async (req: Request, res: Response) : Promise<void> 
     const user = new User({
       FirstName,
       LastName,
-      Email: normalizedEmail,
+      Email: Email,
       Password: hashedPassword,
+      FirstNameNormalized: FirstName.toLowerCase(),
+      LastNameNormalized: LastName.toLowerCase(),
+      EmailNormalized: Email.toLowerCase(),
       CreateName: "SYSTEM",
     });
 
@@ -64,9 +71,8 @@ export const registerUser = async (req: Request, res: Response) : Promise<void> 
   }
 };
 
-export const loginUser = async (req: Request, res: Response) : Promise<void> => {
-  try
-  {
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  try {
     const { Email, Password } = req.body;
 
     // Validate required fields
@@ -75,10 +81,11 @@ export const loginUser = async (req: Request, res: Response) : Promise<void> => 
       return;
     }
 
-    const normalizedEmail = Email.toLowerCase();
-
     // Find user by email
-    const user = await User.findOne({ Email: normalizedEmail, IsDelete : false });
+    const user = await User.findOne({
+      EmailNormalized: Email.toLowerCase(),
+      IsDelete: false,
+    });
 
     if (!user) {
       res.status(401).json({ error: "Invalid email or password." });
@@ -106,8 +113,6 @@ export const loginUser = async (req: Request, res: Response) : Promise<void> => 
       return;
     }
 
-    console.log("Signing token with secret:", process.env.JWT_SECRET);
-
     // Generate JWT token
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
       expiresIn: "1h", // Token expiration time
@@ -120,9 +125,8 @@ export const loginUser = async (req: Request, res: Response) : Promise<void> => 
       token,
       user: userData,
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Login failed." });
   }
-}
+};
