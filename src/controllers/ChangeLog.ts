@@ -1,0 +1,46 @@
+import { Request, Response } from "express";
+import { ChangeLog } from "../models/ChangeLog";
+import { ChangeLogDetails } from "../models/ChangeLogDetails";
+import { AuthRequest } from "../middleware/authMiddleware"; // wherever you put it
+
+
+export const createChangeLog = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { TicketInfo } = req.body;
+
+    // Validate required fields
+    if (
+      !TicketInfo ||
+      !Array.isArray(TicketInfo) ||
+      TicketInfo.length === 0
+    ) {
+      res
+        .status(400)
+        .json({ error: "TicketInfo (array) is required." });
+      return;
+    }
+
+    // Create multiple ChangeLogDetails
+    const detailsDocs = await ChangeLogDetails.insertMany(
+      TicketInfo.map((ticket: string) => ({
+        TicketInfo: ticket?.trim(),
+        CreateName: req.user?.EmailNormalized || "SYSTEM"
+      }))
+    );
+
+    // Create ChangeLog with all details' IDs
+    const changeLog = new ChangeLog({
+      details: detailsDocs.map((doc) => doc._id),
+      CreateName: req.user?.EmailNormalized || "SYSTEM"
+    });
+    await changeLog.save();
+
+    res.status(201).json({ message: "Ticket created.", changeLog });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};

@@ -10,7 +10,12 @@ export const registerUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { FirstName, LastName, Email, Password } = req.body;
+    let { FirstName, LastName, Email, Password } = req.body;
+
+    FirstName = FirstName?.trim();
+    LastName = LastName?.trim();
+    Email = Email?.trim();
+    Password = Password?.trim();
 
     // Validate required fields
     if (!FirstName || !LastName || !Email || !Password) {
@@ -73,7 +78,10 @@ export const registerUser = async (
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { Email, Password } = req.body;
+    let { Email, Password } = req.body;
+
+    Email = Email?.trimt();
+    Password = Password?.trim();
 
     // Validate required fields
     if (!Email || !Password) {
