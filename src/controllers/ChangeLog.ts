@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ChangeLog } from "../models/ChangeLog";
 import { ChangeLogDetails } from "../models/ChangeLogDetails";
-import { AuthRequest } from "../middleware/authMiddleware"; // wherever you put it
+import { AuthRequest } from "../middleware/authMiddleware";
 
 export const createChangeLog = async (
   req: AuthRequest,
@@ -44,9 +44,10 @@ export const getChangeLogs = async (
   res: Response
 ): Promise<void> => {
   try {
-    const changeLogs = await ChangeLog.find()
+    const changeLogs = await ChangeLog.find({ IsDelete: false })
       .populate("Details")
-      .sort({ CreateDate: -1 });
+      .sort({ CreateDate: -1 })
+      .limit(3);
 
     res.status(200).json(changeLogs);
   } catch (error) {

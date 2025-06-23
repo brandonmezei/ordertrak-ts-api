@@ -4,6 +4,7 @@ import { User } from "../models/User";
 import bcrypt from "bcrypt";
 import { isValidPassword } from "../utils/validators";
 import jwt from "jsonwebtoken";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 export const registerUser = async (
   req: Request,
@@ -59,8 +60,6 @@ export const registerUser = async (
       LastName,
       Email: Email,
       Password: hashedPassword,
-      FirstNameNormalized: FirstName.toLowerCase(),
-      LastNameNormalized: LastName.toLowerCase(),
       EmailNormalized: Email.toLowerCase(),
       CreateName: "SYSTEM",
     });
@@ -131,11 +130,37 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({
       message: "Login successful.",
       token,
-      expiresIn: 3600, // 1 hour in seconds
+      expiresIn: Date.now() + 3300000,
       user: userData,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Login failed." });
+  }
+};
+
+export const getUserProfile = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized access." });
+      return;
+    }
+
+    const user = await User.findById(userId).select("-Password");
+
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to retrieve user profile." });
   }
 };

@@ -11,7 +11,6 @@ export interface IChangeLog extends Document {
   UpdateDate?: Date;
   UpdateName?: string;
   IsDelete: boolean;
-  FormID: string;
 }
 
 const ChangeLogSchema = new Schema<IChangeLog>({

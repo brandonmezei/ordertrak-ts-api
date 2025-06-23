@@ -8,8 +8,6 @@ export interface IUser extends Document {
   Password: string;
 
   // Normalized
-  FirstNameNormalized: string;
-  LastNameNormalized: string;
   EmailNormalized: string;
 
   // Inherited
@@ -18,7 +16,6 @@ export interface IUser extends Document {
   UpdateDate?: Date;
   UpdateName?: string;
   IsDelete: boolean;
-  FormID: string;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -26,8 +23,6 @@ const UserSchema = new Schema<IUser>({
   LastName: { type: String, required: true, maxlength: 50 },
   Email: { type: String, required: true, unique:true, maxlength: 100 },
   Password: { type: String, required: true, maxlength: 100 },
-  FirstNameNormalized: { type: String, required: true, maxlength: 50 },
-  LastNameNormalized: { type: String, required: true, maxlength: 50 },
   EmailNormalized: { type: String, required: true, unique:true, maxlength: 100 },
   ...CommonFields,
 });
