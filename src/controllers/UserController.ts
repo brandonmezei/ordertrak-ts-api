@@ -125,17 +125,40 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       expiresIn: "1h", // Token expiration time
     });
 
+    // Set secure, HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // use HTTPS in production
+      sameSite: "strict",
+      maxAge: 60 * 60 * 1000, // 1 hour
+    });
+
     const { Password: _, ...userData } = user.toObject();
 
     res.status(200).json({
       message: "Login successful.",
-      token,
-      expiresIn: Date.now() + 3300000,
       user: userData,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Login failed." });
+  }
+};
+
+export const logoutUser = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    res.status(200).json({ message: "Logged out." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Logout failed." });
   }
 };
 

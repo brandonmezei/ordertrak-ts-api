@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerUser, loginUser, getUserProfile } from '../controllers/UserController';
+import { registerUser, loginUser, getUserProfile, logoutUser } from '../controllers/UserController';
 import { authenticate } from "../middleware/authMiddleware";
 
 const router = Router();
@@ -8,5 +8,13 @@ const router = Router();
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/', authenticate, getUserProfile);
+router.post('/logout', authenticate, logoutUser);
+
+// Validation
+router.get("/validate", authenticate, (req, res) => {
+  res.status(200).json({ valid: true });
+});
+
+
 
 export default router;

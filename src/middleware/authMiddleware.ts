@@ -11,16 +11,7 @@ export const authenticate = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res
-      .status(401)
-      .json({ error: "Authorization header missing or malformed." });
-    return;
-  }
-
-  const token = authHeader.split(" ")[1];
+  const token = req.cookies?.token;
 
   try {
     // Ensure JWT secret is set

@@ -5,14 +5,20 @@ import cors from 'cors';
 import { connectDB } from './config/db';
 import userRoutes from './routes/userRoutes';
 import changeLogRoutes from './routes/changeLogRoutes';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
-connectDB(); // 🔌 Connect to MongoDB
+connectDB(); 
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
+
 app.use(express.json());
+app.use(cookieParser());
 
 // Routes
 app.use('/api/users', userRoutes);
