@@ -3,7 +3,7 @@ import { CommonFields } from "./CommonFields";
 
 export interface IChangeLog extends Document {
   RollOutDate: Date;
-  details: Types.ObjectId[];
+  Details: Types.ObjectId[];
 
   // Inherited
   CreateDate: Date;
@@ -16,7 +16,7 @@ export interface IChangeLog extends Document {
 
 const ChangeLogSchema = new Schema<IChangeLog>({
   RollOutDate: { type: Date, required: true, default: () => new Date() },
-  details: [{ type: Schema.Types.ObjectId, ref: "ChangeLogDetails" }],
+  Details: [{ type: Schema.Types.ObjectId, ref: "ChangeLogDetails" }],
   ...CommonFields,
 });
 

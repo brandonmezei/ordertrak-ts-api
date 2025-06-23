@@ -80,7 +80,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
     let { Email, Password } = req.body;
 
-    Email = Email?.trimt();
+    Email = Email?.trim();
     Password = Password?.trim();
 
     // Validate required fields
@@ -131,6 +131,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({
       message: "Login successful.",
       token,
+      expiresIn: 3600, // 1 hour in seconds
       user: userData,
     });
   } catch (error) {
