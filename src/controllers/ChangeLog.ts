@@ -34,7 +34,6 @@ export const createChangeLog = async (
 
     res.status(201).json({ message: "Ticket created.", changeLog });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Internal server error." });
   }
 };
@@ -51,7 +50,6 @@ export const getChangeLogs = async (
 
     res.status(200).json(changeLogs);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Internal server error." });
   }
 };

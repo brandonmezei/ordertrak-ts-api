@@ -70,7 +70,6 @@ export const registerUser = async (
 
     res.status(201).json({ message: "User registered.", user: userData });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Registration failed." });
   }
 };
@@ -140,7 +139,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       user: userData,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Login failed." });
   }
 };
@@ -157,7 +155,6 @@ export const logoutUser = async (
     });
     res.status(200).json({ message: "Logged out." });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Logout failed." });
   }
 };
@@ -183,7 +180,6 @@ export const getUserProfile = async (
 
     res.status(200).json({ user });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Failed to retrieve user profile." });
   }
 };
