@@ -183,3 +183,70 @@ export const getUserProfile = async (
     res.status(500).json({ error: "Failed to retrieve user profile." });
   }
 };
+
+export const updateUserProfile = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    let { FirstName, LastName, Email } = req.body;
+
+    // Trim fields
+    FirstName = FirstName?.trim();
+    LastName= LastName?.trim();
+    Email = Email?.trim();
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized access." });
+      return;
+    }
+
+    // Validate required fields
+    if (!FirstName || !LastName || !Email) {
+      res.status(400).json({ error: "All fields are required." });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(Email)) {
+      res.status(400).json({ error: "Invalid email format." });
+      return;
+    }
+
+    // Check if email is already in use by another user
+    const existingUser = await User.findOne({
+      EmailNormalized: Email.toLowerCase(),
+      IsDelete: false,
+      _id: { $ne: userId },
+    });
+
+    if (existingUser) {
+      res.status(400).json({ error: "Email already in use." });
+      return;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        FirstName,
+        LastName,
+        Email,
+        EmailNormalized: Email.toLowerCase(),
+        UpdateName: req.user?.EmailNormalized || "SYSTEM",
+      },
+      { new: true }
+    ).select("-Password");
+
+    if (!updatedUser) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    res.status(200).json({ message: "Profile updated.", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update profile." });
+  }
+};
