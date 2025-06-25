@@ -23,7 +23,7 @@ export const authenticate = async (
     const payload = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
 
     const user = await User.findOne({
-      EmailNormalized: payload.email.toLowerCase(),
+      _id : payload.id,
       IsDelete: false,
     });
 

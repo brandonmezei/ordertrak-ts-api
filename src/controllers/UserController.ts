@@ -15,7 +15,7 @@ export const registerUser = async (
 
     FirstName = FirstName?.trim();
     LastName = LastName?.trim();
-    Email = Email?.trim();
+    Email = Email?.trim().toLowerCase();
     Password = Password?.trim();
 
     // Validate required fields
@@ -34,7 +34,7 @@ export const registerUser = async (
 
     // Check if Already in Use
     const existingUser = await User.findOne({
-      EmailNormalized: Email.toLowerCase(),
+      Email,
       IsDelete: false,
     });
 
@@ -58,9 +58,8 @@ export const registerUser = async (
     const user = new User({
       FirstName,
       LastName,
-      Email: Email,
+      Email,
       Password: hashedPassword,
-      EmailNormalized: Email.toLowerCase(),
       CreateName: "SYSTEM",
     });
 
@@ -78,7 +77,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
     let { Email, Password } = req.body;
 
-    Email = Email?.trim();
+    Email = Email?.trim().toLowerCase();
     Password = Password?.trim();
 
     // Validate required fields
@@ -89,7 +88,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     // Find user by email
     const user = await User.findOne({
-      EmailNormalized: Email.toLowerCase(),
+      Email,
       IsDelete: false,
     });
 
@@ -194,8 +193,8 @@ export const updateUserProfile = async (
 
     // Trim fields
     FirstName = FirstName?.trim();
-    LastName= LastName?.trim();
-    Email = Email?.trim();
+    LastName = LastName?.trim();
+    Email = Email?.trim().toLowerCase();
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized access." });
@@ -218,7 +217,7 @@ export const updateUserProfile = async (
 
     // Check if email is already in use by another user
     const existingUser = await User.findOne({
-      EmailNormalized: Email.toLowerCase(),
+      Email,
       IsDelete: false,
       _id: { $ne: userId },
     });
@@ -234,8 +233,7 @@ export const updateUserProfile = async (
         FirstName,
         LastName,
         Email,
-        EmailNormalized: Email.toLowerCase(),
-        UpdateName: req.user?.EmailNormalized || "SYSTEM",
+        UpdateName: req.user?.Email || "SYSTEM",
       },
       { new: true }
     ).select("-Password");

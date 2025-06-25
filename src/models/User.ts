@@ -7,9 +7,6 @@ export interface IUser extends Document {
   Email: string;
   Password: string;
 
-  // Normalized
-  EmailNormalized: string;
-
   // Inherited
   CreateDate: Date;
   CreateName: string;
@@ -23,7 +20,6 @@ const UserSchema = new Schema<IUser>({
   LastName: { type: String, required: true, maxlength: 50 },
   Email: { type: String, required: true, unique:true, maxlength: 100 },
   Password: { type: String, required: true, maxlength: 100 },
-  EmailNormalized: { type: String, required: true, unique:true, maxlength: 100 },
   ...CommonFields,
 });
 

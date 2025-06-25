@@ -20,14 +20,14 @@ export const createChangeLog = async (
     const detailsDocs = await ChangeLogDetails.insertMany(
       TicketInfo.map((ticket: string) => ({
         TicketInfo: ticket?.trim(),
-        CreateName: req.user?.EmailNormalized || "SYSTEM",
+        CreateName: req.user?.Email || "SYSTEM",
       }))
     );
 
     // Create ChangeLog with all details' IDs
     const changeLog = new ChangeLog({
       Details: detailsDocs.map((doc) => doc._id),
-      CreateName: req.user?.EmailNormalized || "SYSTEM",
+      CreateName: req.user?.Email || "SYSTEM",
     });
 
     await changeLog.save();
