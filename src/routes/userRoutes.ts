@@ -5,6 +5,7 @@ import {
   getUserProfile,
   logoutUser,
   updateUserProfile,
+  changeUserPassword
 } from "../controllers/UserController";
 import { authenticate } from "../middleware/authMiddleware";
 
@@ -16,6 +17,8 @@ router.post("/login", loginUser);
 
 router.get("/", authenticate, getUserProfile);
 router.post("/", authenticate, updateUserProfile);
+router.post("/change-password", authenticate, changeUserPassword);
+
 router.post("/logout", authenticate, logoutUser);
 
 // Validation

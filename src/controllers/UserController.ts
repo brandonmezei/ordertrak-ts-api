@@ -248,3 +248,64 @@ export const updateUserProfile = async (
     res.status(500).json({ error: "Failed to update profile." });
   }
 };
+
+export const changeUserPassword = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    let { CurrentPassword, NewPassword } = req.body;
+
+    // Trim fields
+    CurrentPassword = CurrentPassword?.trim();
+    NewPassword = NewPassword?.trim();
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized access." });
+      return;
+    }
+
+    // Validate required fields
+    if (!CurrentPassword || !NewPassword) {
+      res.status(400).json({ error: "Current and new passwords are required." });
+      return;
+    }
+
+    if (!isValidPassword(NewPassword)) {
+      res.status(400).json({
+        error:
+          "New password must be at least 8 characters and include uppercase, lowercase, and a number.",
+      });
+      return;
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    // Compare current password
+    const isMatch = await bcrypt.compare(CurrentPassword, user.Password);
+
+    if (!isMatch) {
+      res.status(401).json({ error: "Current password is incorrect." });
+      return;
+    }
+
+    // Hash the new password
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(NewPassword, saltRounds);
+
+    user.Password = hashedNewPassword;
+    user.UpdateName = req.user?.Email || "SYSTEM";
+
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to change password." });
+  }
+}
